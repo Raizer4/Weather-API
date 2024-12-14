@@ -1,5 +1,8 @@
 package com.example.weather.service;
 
+import com.example.weather.api.GeoCodingClientAPI;
+import com.example.weather.api.OpenWeatherClientAPI;
+import com.example.weather.dto.GeocodingResponseDto;
 import com.example.weather.dto.OpenWeatherResponseDto;
 import com.example.weather.dto.WeatherRequestDto;
 import com.example.weather.entity.Location;
@@ -10,6 +13,8 @@ import com.example.weather.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +22,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CityWeatherService {
 
+    private final GeoCodingClientAPI geoCodingClientAPI;
+    private final OpenWeatherClientAPI openWeatherClientAPI;
     private final SessionService sessionService;
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
 
+    public List<GeocodingResponseDto> getCityByName(String cityName){
+        try {
+            WeatherRequestDto weatherRequestDto = WeatherRequestDto.builder()
+                    .cityName(URLEncoder.encode(cityName, Charset.defaultCharset()))
+                    .build();
+
+            return geoCodingClientAPI.makeCall(weatherRequestDto);
+        }catch (ConnectionErrorException e){
+            throw new RuntimeException("Wrong Geocoding API call");
+        }
+    }
 
     public List<OpenWeatherResponseDto> getWeatherInCities(String sessionId) {
         User user = sessionService.getSessionUser(sessionId);
@@ -36,7 +54,7 @@ public class CityWeatherService {
                         .longitude(location.getLongitude())
                         .build();
 
-                response.add();
+                response.add(openWeatherClientAPI.makeCall(weatherRequesDto));
             }
         }catch (ConnectionErrorException e){
             throw new RuntimeException("Wrong Weather API call");

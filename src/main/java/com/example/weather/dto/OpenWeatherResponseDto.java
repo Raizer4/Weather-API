@@ -12,13 +12,16 @@ import lombok.ToString;
 import org.springframework.stereotype.Service;
 
 @Getter
-@Service
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public class OpenWeatherResponseDto {
 
     @JsonIgnore
     private int cityId;
+
+    @JsonIgnore
+    private String cityName;
 
     @JsonProperty("coord")
     private Coord coord;

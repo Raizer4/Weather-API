@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Found Cities</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/Weather/css/home-found-locations.css">
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const messages = [
+        "Find your next adventure, bro!",
+        "Discover cool cities with us!",
+        "Get the latest weather updates!",
+        "Explore places you’ll love, man.",
+        "Your cities, your weather updates!",
+        "Stay in the loop with city weather.",
+        "Add cities to your list, dude!",
+        "Track your cities, easy peasy.",
+        "Weather made simple for your cities.",
+        "Add cities, see their weather, bro!",
+        "No way, bro, they named it: Saint-Louis-du-Ha! Ha! – Crazy, right?",
+        "Dude, check this out: Llanfairpwllgwyngyll – That’s a mouthful!",
+        "You gotta see: Chargoggagoggmanchauggagoggchaubunagungamaugg – No joke!",
+        "No way they really named it: Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch",
+        "Bro, there’s a place called: San Fernando del Valle de Catamarca – Seriously long!",
+        "Check it: Kiskunfélegyháza – Long name, man!",
+        "Ever heard of: Ekibastuz – That name’s longer than you think!",
+        "No joke: Los Estados Unidos Mexicanos – Not a city, but a long name!",
+        "You seen: Villavicencio – A name that’s longer than you’d expect!",
+        "Guess what: Porto Alegre – The name’s longer than it sounds!",
+        "Man, Guelph’s name is short but it’s got a story!",
+        "Dude, San Fernando del Valle de Catamarca – Crazy long name!",
+        "Yo, Mahajanga – A city with a surprisingly long name!",
+        "No kidding: Los Angeles de Chiquitos – Quite a name for a city!",
+        "Bro, La Paz – The name’s simple but it’s got a vibe!",
+        "San Juan de los Morros – Quite the name for a Venezuelan city!",
+        "Yo, check out Niamey – The capital city of Niger, bro!",
+        "Dude, there's also Zinder – A city in Niger with a cool name!",
+        "Ever heard of Maradi? – A major city in Niger, man!",
+        "Bro, Agadez is another city in Niger – Pretty interesting name!",
+        "Check it out: Diffa – Another city in Niger with a unique vibe!",
+        "Man, there’s also Tera – A city in Niger, short but sweet!",
+        "No joke, there's Say – A city in Niger with a simple name!",
+        "Dude, don’t miss out on Dogondoutchi – A city in Niger with a long name!"
+      ];
+
+      function updateMessage() {
+        const messageElement = document.querySelector('.marquee span');
+        messageElement.textContent = messages[Math.floor(Math.random() * messages.length)];
+      }
+
+      function updateCoords() {
+        document.querySelectorAll('.city-card').forEach(card => {
+          const latitudeElement = card.querySelector('.latitude');
+          const longitudeElement = card.querySelector('.longitude');
+
+          if (latitudeElement && longitudeElement) {
+            latitudeElement.textContent = (+latitudeElement.textContent).toFixed(3);
+            longitudeElement.textContent = (+longitudeElement.textContent).toFixed(3);
+          }
+        });
+      }
+
+      function addCity(event, cityName, latitude, longitude, card) {
+        fetch('/Weather/found-locations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `cityName=${cityName}&latitude=${latitude}&longitude=${longitude}`
+        }).then(response => {
+          if (response.ok) {
+            card.classList.add('added');
+          }
+        }).catch(error => {
+          console.error('Error adding city', error);
+        });
+      }
+
+      document.querySelectorAll('.city-card').forEach(card => {
+        card.addEventListener('click', (event) => {
+          const cityName = card.querySelector('h3').textContent;
+          const latitude = card.querySelector('.latitude').textContent;
+          const longitude = card.querySelector('.longitude').textContent;
+          addCity(event, cityName, latitude, longitude, card);
+        });
+      });
+
+      updateMessage();
+      updateCoords();
+      setInterval(updateMessage, 15000);
+    });
+  </script>
+
+</head>
+
+<body>
+<div class="background"></div>
+
+<div class="top-bar">
+
+  <form th:action="@{/found-locations}" method="get">
+    <input type="text" class="form-control" name="cityName" placeholder="Enter city name">
+    <button type="submit" class="btn" name="action" value="search">Search</button>
+  </form>
+
+  <div class="marquee">
+    <span>You can add cities to see the weather in them just by click</span>
+  </div>
+
+  <div class="return-home">
+    <a th:href="@{/home}" class="btn">Home page</a>
+  </div>
+
+</div>
+
+<div class="error-message" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+<div class="content">
+  <div class="city-cards">
+    <div class="city-card" th:each="city : ${foundCities}">
+      <h3 th:text="${city.name}">City Name</h3>
+      <p>Country: <span th:text="${city.country}">Country</span></p>
+      <p>Latitude: <span class="latitude" th:text="${city.latitude}">Latitude</span></p>
+      <p>Longitude: <span class="longitude" th:text="${city.longitude}">Longitude</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+</div>

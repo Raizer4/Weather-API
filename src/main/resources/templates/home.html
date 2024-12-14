@@ -94,11 +94,12 @@
     });
   </script>
 
-
-
 </head>
+
+
 <body>
 <div class="background"></div>
+
 <div class="top-bar">
   <form th:action="@{/found-locations}" method="get">
     <input type="text" class="form-control" name="cityName" placeholder="Enter city name">
@@ -114,6 +115,7 @@
     </form>
   </div>
 </div>
+
 <div class="content">
   <div class="city-cards">
     <div class="city-card" th:each="city : ${weatherCities}">
@@ -140,7 +142,7 @@
     </div>
   </div>
 </div>
+
 <div class="footer">
-  <a href="https://github.com/ArturChegur" target="_blank">© 2024–2024 Created by ArturChegur. All rights
-    reserved.</a>
+
 </div>
