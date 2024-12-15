@@ -8,6 +8,7 @@ import com.example.weather.dto.WeatherRequestDto;
 import com.example.weather.entity.Location;
 import com.example.weather.entity.User;
 import com.example.weather.exception.ConnectionErrorException;
+import com.example.weather.exception.LocationException;
 import com.example.weather.repository.LocationRepository;
 import com.example.weather.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +64,21 @@ public class CityWeatherService {
         return response;
     }
 
+    public void saveCityToUserFavourites(WeatherRequestDto weatherRequestDto, String sessionId) {
+        User user = sessionService.getSessionUser(sessionId);
+        user.getLocations().add(addLocation(weatherRequestDto,user));
+    }
+
+    private Location addLocation(WeatherRequestDto weatherRequestDto, User user) {
+        Location location = new Location().builder()
+                .author(user)
+                .name(weatherRequestDto.getCityName())
+                .latitude(weatherRequestDto.getLatitude())
+                .longitude(weatherRequestDto.getLongitude())
+                .build();
+
+        locationRepository.save(location);
+        return location;
+    }
 
 }

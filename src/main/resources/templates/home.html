@@ -98,16 +98,20 @@
 
 
 <body>
+
 <div class="background"></div>
 
 <div class="top-bar">
+
   <form th:action="@{/found-locations}" method="get">
     <input type="text" class="form-control" name="cityName" placeholder="Enter city name">
     <button type="submit" class="btn" name="action" value="search">Search</button>
   </form>
+
   <div class="marquee">
     <span>You can delete cities to see the weather in them just by click</span>
   </div>
+
   <div class="user-info">
     <span th:text="${username}">Username</span>
     <form th:action="@{/logout}" method="get" style="margin: 0;">
@@ -117,12 +121,15 @@
 </div>
 
 <div class="content">
+
   <div class="city-cards">
+
     <div class="city-card" th:each="city : ${weatherCities}">
       <input type="hidden" th:value="${city.cityId}" class="city-id"/>
       <h3 th:text="${city.cityName}">City Name</h3>
       <p>Latitude: <span class="latitude" th:text="${city.coord.lat}">Latitude</span></p>
       <p>Longitude: <span class="longitude" th:text="${city.coord.lon}">Longitude</span></p>
+
       <p><i class="fas fa-thermometer-half"></i> Temperature: <span class="temperature"
                                                                     th:text="${city.main.temp}">Temperature</span>
         °C</p>
@@ -140,7 +147,9 @@
       <p><i class="fas fa-tint"></i> Humidity: <span th:text="${city.main.humidity}">Humidity</span> %</p>
       <p><i class="fas fa-wind"></i> Wind Speed: <span th:text="${city.wind.speed}">Wind Speed</span> m/s</p>
     </div>
+
   </div>
+
 </div>
 
 <div class="footer">

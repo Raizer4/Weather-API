@@ -2,19 +2,22 @@ package com.example.weather.controller;
 
 import com.example.weather.dto.GeocodingResponseDto;
 import com.example.weather.dto.OpenWeatherResponseDto;
+import com.example.weather.dto.WeatherRequestDto;
 import com.example.weather.exception.UnauthorizedException;
 import com.example.weather.exception.UserNotFoundExcepiton;
 import com.example.weather.service.CityWeatherService;
 import com.example.weather.service.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -27,10 +30,6 @@ public class HomeController {
 
     @GetMapping("/home")
     public String loadHomePage(@CookieValue(name = "JSESSIONID", required = false) String sessionId, Model model){
-        if (sessionId == null || sessionId.isEmpty()){
-            throw new UnauthorizedException("Session cookie is missing");
-        }
-
         List<OpenWeatherResponseDto> citiesWeather;
 
         try {
@@ -45,12 +44,21 @@ public class HomeController {
         return "home";
     }
 
+    @PostMapping("/home")
+    public void saveLocation(@CookieValue(name = "JSESSIONID", required = false) String sessionId,
+                             @RequestBody WeatherRequestDto weatherRequestDto)
+    {
+        try {
+            weatherService.saveCityToUserFavourites(weatherRequestDto,sessionId);
+            ResponseEntity.ok("Location saved successfully");
+        }catch (Exception e){
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred");
+        }
+    }
+
     @GetMapping("/found-locations")
     public String foundLocation(@RequestParam(name = "cityName", required = false) String cityName, Model model){
-        if (cityName == null || cityName.isBlank()) {
-           throw new RuntimeException();
-        }
-
         List<GeocodingResponseDto> foundCities;
 
         try {
@@ -67,5 +75,7 @@ public class HomeController {
 
         return "found-locations";
     }
+
+
 
 }

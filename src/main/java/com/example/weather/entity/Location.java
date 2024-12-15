@@ -24,7 +24,7 @@ public class Location {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "author")
     private User author;
 

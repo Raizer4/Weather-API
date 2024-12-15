@@ -24,6 +24,7 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Location> locations;
 
